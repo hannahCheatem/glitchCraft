@@ -1,0 +1,49 @@
+///scr_loadGame
+
+var file = file_text_open_read(working_directory + "mySave.txt")
+var saveString = file_text_read_string(file);
+file_text_close(file);
+saveString = base64_decode(saveString);
+var saveData = json_decode(saveString);
+
+var saveRoom = saveData[? "room"];
+if (room != saveRoom){
+    room_goto(saveRoom);
+}
+
+with (obj_playerStats){
+    player_xStart = saveData[? "x"]
+    player_yStart = saveData[? "y"]
+    if (instance_exists(obj_player)){
+        obj_player.x = player_xStart;
+        obj_player.y = player_yStart;
+        obj_player.phy_position_x = player_xStart;
+        obj_player.phy_position_y = player_yStart;
+        obj_player.persistent = true;
+    } else {
+        instance_create(player_xStart, player_yStart, obj_player);
+    }
+    hp = saveData[? "hp"];
+    maxHp = saveData[? "maxHp"];
+    stamina = saveData[? "stamina"];
+    maxStamina = saveData[? "maxStamina"];
+    expr = saveData[? "expr"];
+    maxExpr = saveData[? "maxExpr"];
+    level = saveData[? "level"];
+    attack = saveData[? "attack"];
+    money = saveData[? "money"];
+    equippedItem = saveData[? "equippedItem"];
+}
+
+with (obj_inventory){
+    var i = 0;
+    for (var xx = 0; xx < width; xx++){
+        for (var yy = 0; yy < height; yy++){
+            obj_inventory.box[# xx, yy]= saveData[? string_insert(string(i), "inventoryItem", 13)];
+            obj_inventory.count[# xx, yy] = saveData[? string_insert(string(i), "inventoryCount", 14)] ;
+            i++; 
+        }
+    }
+}
+
+ds_map_destroy(saveData);
