@@ -1,0 +1,217 @@
+///Creation Code:
+
+/// Initialize speaker
+dialog = noone;
+dialogPage = 0;
+//xoffset = -32;
+//yoffset = -45;
+
+//npcArray:
+//0 = text (in array form)
+//1 = sprite
+//2 = number of responses
+//3 = is this a shop
+//4 = index of the first of the for responses to this
+
+//userArray:
+//0 = text (just in text form)
+//1 = npc response //true or false, 1 or 0
+//2 = script activated, if any
+//3 = is this a shop
+//4 = index of response, if there is one. -1 if there isn't one
+
+
+enum speech {
+    text = 0,
+    sprite = 1,
+    responses = 2,
+    responseStart = 3,
+    shop = 4
+    
+}
+
+
+//defaults
+shop = false;
+isNpc = true;
+current = 0;
+run = 0;
+
+text[0] = "Wanna buy some drugs?";
+text[1] = "I have lots for sale!";
+
+sprite = spr_skelemanTalkSprite;
+
+npc[0,0] = text;
+npc[0,1] = sprite;
+npc[0,2] = 2;
+npc[0,3] = 0
+npc[0,4] = false;
+
+//userResponse1[0] = "Okay";
+user[0,0] = "Okay";
+user[0,1] = spr_blank;
+user[0,2] = 0;
+user[0,3] = -1;
+user[0,4] = true;
+
+//userResponse2[0] = "Nah";
+user[1,0] = "Nah";
+user[1,1] = spr_blank;
+user[1,2] = 1;
+user[1,3] = 1;
+user[1,4] = false;
+
+npcResponse[0] = "goodbye!";
+npc[1,0] = npcResponse;
+npc[1,1] = sprite;
+npc[1,2] = 0;
+npc[1,3] = -1;
+npc[1,4] = false;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+///Player Collision Code:
+/// activate dialog
+
+if (run = 0){
+    npcDefault = npc;
+    userDefault = user;
+    shopDefault = shop;
+    isNpcDefault = isNpc;
+    currentDefault = 0;
+}
+
+scr_get_input();
+
+if(talk_key){
+    run = 1;
+    if (!instance_exists(dialog)){
+        //dialog = instance_create(x+xoffset, y+yoffset, obj_dialog);
+        center = view_xview + display_get_gui_width()/2;
+        dialog = instance_create(center, (view_yview + display_get_gui_height() - 20), obj_dialog);
+        obj_dialog.sprite = npc[current, speech.sprite];
+        dialog.text = npc[current, speech.text];
+    } else {
+        if (dialog.isNpc = true) {
+            obj_dialog.sprite = npc[current, speech.sprite];
+            dialog.text_page++;
+            dialog.text_count = 0;
+            if (dialog.text_page > array_length_1d(dialog.text)-1) {
+                //marks end of dialog
+                if (npc[current,speech.responses] > 0) {
+                    //switching to user text
+                    
+                    dialog.text_page = 0;
+                    //dialog.text = noone;
+                    for (var i = 0; i < npc[current,speech.responses]; i++) {
+                        dialog.text[i] = user[(npc[current,speech.responseStart]+i), speech.text];
+                    }
+                    dialog.isNpc = false;
+                    obj_dialog.sprite = spr_blank;
+                    obj_input.talk_key = false;
+                } else {
+                    dialog.shop = npc[current, speech.shop]
+                    with (dialog) {
+                        instance_destroy();
+                        if (shop = true){
+                            if (room != rm_shop){
+                                if (instance_exists(obj_player)){
+                                    obj_player.persistent = false; 
+                                    //obj_playerStats.persistent = false;   
+                                }
+                                //room.persistent = true
+                                room_persistent = true;
+                                obj_playerStats.previousRoom = room;
+                                room_goto(rm_shop);
+                                //previousRoom.persistent = true;
+                            } else {
+                                room_goto(obj_playerStats.previousRoom)
+                                //room.persistent = false;
+                            }
+                        }
+                
+                        obj_input.talk_key = false;
+                    }
+                    
+                    //reset defaults
+                    run = 0
+                    npc = npcDefault;
+                    user = userDefault;
+                    shop = shopDefault;
+                    isNpc = isNpcDefault;
+                    current = currentDefault;
+                    
+                }
+            }
+        } else if (dialog.isNpc = false) {
+            //user has made a selection
+            //display user options: 
+            
+            /*
+            while (dialog.text_page < array_length_1d(dialog.text)){
+                dialog.text_page++;
+                dialog.text_count = 0;
+            }//make so that while user = true, dialog does not erase prev pages
+            */
+            if (user[dialog.userChoice,speech.responses] > 0){
+                //switching to npc text
+                dialog.text_page = 0;
+                //dialog.text = noone;
+                current = user[dialog.userChoice,speech.responses];
+                dialog.text = npc[current,speech.text];
+                dialog.isNpc = true;
+                dialog.sprite = npc[current,speech.sprite];
+            } else {
+                //marks end of dialog
+                dialog.shop = user[dialog.userChoice, speech.shop]
+                with (dialog) {
+                    instance_destroy();
+                        if (shop = true){
+                            if (room != rm_shop){
+                                if (instance_exists(obj_player)){
+                                    obj_player.persistent = false; 
+                                    //obj_playerStats.persistent = false;   
+                                }
+                                //room.persistent = true
+                                room_persistent = true;
+                                obj_playerStats.previousRoom = room;
+                                room_goto(rm_shop);
+                                //previousRoom.persistent = true;
+                            } else {
+                                room_goto(obj_playerStats.previousRoom)
+                                //room.persistent = false;
+                            }
+                        }
+                
+                    obj_input.talk_key = false;
+                }
+                
+                //reset defaults
+                run = 0
+                npc = npcDefault;
+                user = userDefault;
+                shop = shopDefault;
+                isNpc = isNpcDefault;
+                current = currentDefault;    
+            }
+        }
+    }
+}
+
+if(instance_exists(dialog)){
+    if(instance_exists(obj_player))
+        obj_player.spd = 0;
+    if(instance_exists(obj_enemy))
+        obj_enemy.spd = 0;
+} else {
+    if(instance_exists(obj_player))
+        obj_player.spd = obj_player.spdReset;
+    if(instance_exists(obj_enemy))        
+        obj_enemy.spd = obj_enemy.spdReset;
+}
