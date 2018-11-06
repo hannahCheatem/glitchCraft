@@ -1,0 +1,59 @@
+///scr_movePlayer: moves player
+
+scr_getInput();
+player = obj_playerStats.selected;
+
+//diagonal movement
+    if up_key && right_key {
+        sprite = spr_playerUpRight;
+        player.phy_position_y -= player.moveSpeed * 0.5;
+        player.phy_position_x += player.moveSpeed;
+        up_key = false;
+        right_key = false;
+    }
+    else if down_key && right_key {
+      sprite = spr_playerDownRight;
+        player.phy_position_y += player.moveSpeed * 0.5;
+        player.phy_position_x += player.moveSpeed;
+        down_key = false;
+        right_key = false;
+    }
+    else if up_key && left_key {
+        sprite = spr_playerUpLeft;
+        player.phy_position_y -= player.moveSpeed * 0.5;
+        player.phy_position_x -= player.moveSpeed;
+        up_key = false;
+        left_key = false;
+    }
+    else if down_key && left_key {
+        sprite = spr_playerDownLeft;
+        player.phy_position_y += player.moveSpeed * 0.5;
+        player.phy_position_x -= player.moveSpeed;
+        down_key = false;
+        left_key = false;
+    }
+
+// four direction movement
+    else if up_key {
+        sprite = spr_playerUp;
+        player.phy_position_y -= player.moveSpeed;
+        up_key = false;
+    }
+
+    else if down_key {
+        sprite = spr_playerDown;
+        player.phy_position_y += player.moveSpeed;
+        down_key = false;
+
+    } 
+    if left_key {
+        sprite = spr_playerLeft;
+        player.phy_position_x -= player.moveSpeed;
+        left_key = false;
+    }
+        
+    else if right_key {
+        sprite = spr_playerRight;
+        player.phy_position_x += player.moveSpeed;
+        right_key = false;
+    }
