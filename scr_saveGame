@@ -1,0 +1,47 @@
+///scr_saveGame()
+
+// Make sure player is not dead/ exists
+if(!instance_exists(obj_playerStats))
+    exit;
+
+// Create save sata structure
+var saveData = ds_map_create();
+
+with (obj_playerStats) {
+    saveData[? "room"] = previousRoom;
+    saveData[? "x"] = player_xStart;
+    saveData[? "y"] = player_yStart;
+    saveData[? "hp"] = hp;
+    saveData[? "maxHp"] = maxHp;
+    saveData[? "stamina"] = stamina;
+    saveData[? "maxStamina"] = maxStamina;
+    saveData[? "expr"] = expr;
+    saveData[? "maxExpr"] = maxExpr;
+    saveData[? "level"] = level;
+    saveData[? "attack"] = attack;
+    saveData[? "money"] = money;
+    saveData[? "equippedItem"] = equippedItem;
+}
+
+with (obj_inventory) {
+    var i = 0;
+    for (var xx = 0; xx < width; xx++){
+        for (var yy = 0; yy < height; yy++){
+            saveData[? string_insert(string(i), "inventoryItem", 13)] = obj_inventory.box[# xx, yy];
+            saveData[? string_insert(string(i), "inventoryCount", 14)] = obj_inventory.count[# xx, yy];
+            i++; 
+        }
+    }
+}
+
+
+//json = javascript object notation
+var saveString = json_encode(saveData);
+ds_map_destroy(saveData);
+saveString = base64_encode(saveString);
+
+var file = file_text_open_write(working_directory + "mySave.txt");
+file_text_write_string(file, saveString);
+file_text_close(file)
+
+show_message("Game Saved");
