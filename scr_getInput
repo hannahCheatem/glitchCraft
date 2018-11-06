@@ -1,0 +1,16 @@
+///scr_getInput(): gets input from user
+
+up_key = keyboard_check(vk_up);
+down_key = keyboard_check(vk_down);
+left_key = keyboard_check(vk_left);
+right_key = keyboard_check(vk_right);
+
+p1_key = keyboard_check(ord('1')); //Emma
+p2_key = keyboard_check(ord('2')); //Amy
+
+dash_key = keyboard_check_pressed(ord('C'));
+attack_key = keyboard_check_pressed(ord('X'));
+pause_key = keyboard_check_pressed(ord('P'));
+map_key = keyboard_check_pressed(ord('M'));
+talk_key = keyboard_check_pressed(ord('Z'));
+inventory_key = keyboard_check_pressed(ord('I'));
