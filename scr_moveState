@@ -1,0 +1,15 @@
+///scr_move_state
+
+if(obj_input.dash_key && obj_playerStats.stamina>=DASH_COST)
+{
+    state = scr_dash_state;
+    alarm[0]=room_speed/8;
+    obj_playerStats.stamina -= DASH_COST;
+    obj_playerStats.alarm[0] = room_speed; //room_speed = 1 second?
+}
+
+if(obj_input.attack_key)
+{
+    image_index = 0;
+    state = scr_attack_state;
+}
