@@ -1,0 +1,113 @@
+///create event
+
+/// Initialize Dialog Object
+
+//original x and y initialization is in damage object (speaker object)
+
+margin = 16;
+image_xscale = (view_wport + margin*2) / room_width;
+image_yscale = image_xscale;
+
+shop = false;
+userChoice = 0;
+
+text = noone;
+text_visable = "";
+text_page = 0;
+text_count = 0;
+spd = 1;
+sprite = spr_skelemanTalkSprite;
+optionIndex = 0;
+
+display_scale = display_get_gui_width()/view_wview[0];
+width = sprite_get_width(spr_dialogueBox) * image_xscale;
+height = sprite_get_height(spr_dialogueBox) * image_yscale;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+///Alarm 0 code:
+
+///menu alarm
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+///Step Event:
+
+///control user options
+
+///Control the menu
+
+if (isNpc = false){
+
+    if (alarm[0] <= 0) {
+        if (obj_input.down_key){
+            if (userChoice < array_length_1d(text)-1){
+                userChoice++;
+            } else {
+                userChoice = 0;
+            }
+            alarm[0] = room_speed/6; // 1/6 of a second
+        }
+    
+        if (obj_input.up_key){
+            if (userChoice > 0){
+                userChoice--;
+            } else {
+                userChoice = array_length_1d(text)-1;
+            }
+            alarm[0] = room_speed/6; // 1/6 of a second
+        }
+    
+        if (obj_input.talk_key){
+            //isNpc = true;
+            obj_input.talk_key = false;
+        }  
+    }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+///Draw GUI
+
+/// Draw the dialog
+
+//NOTE: draw_GUI layers have own coordinates starting at top corner of screen (0,0), always width of screen
+
+x = display_get_gui_width()/2;
+y = display_get_gui_height() - margin;
+//draw_sprite_ext(spr_dialogueBox, image_index, x, y, image_xscale, image_yscale, 0, c_white, 1);
+draw_sprite_ext(spr_dialogueBox, image_index, x, y, 1.5, 1.5, 0, c_white, 1);
+//draw_self();
+
+draw_set_color(c_white);
+
+text_count += spd;
+
+xx = (x - (width/2) - margin) + sprite_get_width(sprite) + margin;
+yy = y - height + margin
+
+if (isNpc = true){
+    text_visible = string_copy(text[text_page], 0, text_count);
+    draw_text_ext( xx, yy, text_visible, -1, width - sprite_get_width(sprite) - (margin*2));
+
+} else {
+    //user options
+    for (var i = 0; i < array_length_1d(text); i++){
+        draw_set_color(c_black);
+        if (i == userChoice) {
+            draw_set_color(c_white);
+        }
+        draw_text(xx, yy + (i*20), text[i]);
+    }
+}
+    
+//var xx = (x + view_xview);// * display_scale;
+//var yy = (y - view_yview);// * display_scale;
+
+//center = (view_wview/2) + view_xview[view_current];
+
+//draw_text_ext( (x - (width/2) - margin) + sprite_get_width(sprite) + margin, y - height + margin, text_visible, -1, width - sprite_get_width(sprite) - (margin*2));
+
+///Draw Sprite
+if(room != rm_inventory && room != rm_map)
+    draw_sprite(sprite, image_index, x - (width/2) - margin, y - margin);
